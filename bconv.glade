@@ -1,0 +1,215 @@
+<?xml version="1.0"?>
+<interface>
+  <requires lib="gtk+" version="2.16"/>
+  <!-- interface-naming-policy project-wide -->
+  <object class="GtkWindow" id="main_window">
+    <property name="width_request">700</property>
+    <property name="title" translatable="yes">&#x41F;&#x430;&#x43A;&#x435;&#x442;&#x43D;&#x43E;&#x435; &#x441;&#x436;&#x430;&#x442;&#x438;&#x435;</property>
+    <property name="window_position">center</property>
+    <signal name="destroy" handler="on_main_window_destroy"/>
+    <child>
+      <object class="GtkTable" id="table1">
+        <property name="visible">True</property>
+        <property name="n_rows">7</property>
+        <property name="n_columns">3</property>
+        <property name="column_spacing">2</property>
+        <property name="row_spacing">2</property>
+        <child>
+          <object class="GtkEntry" id="dest_edit">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">&#x41A;&#x430;&#x442;&#x430;&#x43B;&#x43E;&#x433;, &#x43A;&#x443;&#x434;&#x430; &#x437;&#x430;&#x43F;&#x438;&#x441;&#x44B;&#x432;&#x430;&#x442;&#x44C; &#x43F;&#x43E;&#x436;&#x430;&#x442;&#x44B;&#x435; &#x444;&#x43E;&#x442;&#x43E;&#x433;&#x440;&#x430;&#x444;&#x438;&#x438;</property>
+            <property name="invisible_char">&#x25CF;</property>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+            <property name="top_attach">1</property>
+            <property name="bottom_attach">2</property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label1">
+            <property name="visible">True</property>
+            <property name="xpad">3</property>
+            <property name="ypad">3</property>
+            <property name="label" translatable="yes">&#x418;&#x441;&#x445;&#x43E;&#x434;&#x43D;&#x44B;&#x439; &#x43A;&#x430;&#x442;&#x430;&#x43B;&#x43E;&#x433;</property>
+            <property name="justify">right</property>
+            <property name="single_line_mode">True</property>
+          </object>
+          <packing>
+            <property name="x_options">GTK_FILL</property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label2">
+            <property name="visible">True</property>
+            <property name="xpad">3</property>
+            <property name="ypad">3</property>
+            <property name="label" translatable="yes">&#x420;&#x435;&#x437;&#x443;&#x43B;&#x44C;&#x442;&#x438;&#x440;&#x443;&#x44E;&#x449;&#x438;&#x439; &#x43A;&#x430;&#x442;&#x430;&#x43B;&#x43E;&#x433;</property>
+            <property name="justify">right</property>
+            <property name="single_line_mode">True</property>
+          </object>
+          <packing>
+            <property name="top_attach">1</property>
+            <property name="bottom_attach">2</property>
+            <property name="x_options">GTK_FILL</property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="dest_button">
+            <property name="label" translatable="yes">&#x412;&#x44B;&#x431;&#x440;&#x430;&#x442;&#x44C;...</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_dest_button_clicked"/>
+          </object>
+          <packing>
+            <property name="left_attach">2</property>
+            <property name="right_attach">3</property>
+            <property name="top_attach">1</property>
+            <property name="bottom_attach">2</property>
+            <property name="x_options"></property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="src_button">
+            <property name="label" translatable="yes">&#x412;&#x44B;&#x431;&#x440;&#x430;&#x442;&#x44C;...</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_src_button_clicked"/>
+          </object>
+          <packing>
+            <property name="left_attach">2</property>
+            <property name="right_attach">3</property>
+            <property name="x_options"></property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="run_button">
+            <property name="label" translatable="yes">&#x424;&#x438;&#x433;&#x430;&#x447;&#x438;&#x442;&#x44C;!</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_run_button_clicked"/>
+          </object>
+          <packing>
+            <property name="right_attach">3</property>
+            <property name="top_attach">4</property>
+            <property name="bottom_attach">5</property>
+            <property name="x_options"></property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label3">
+            <property name="visible">True</property>
+            <property name="xpad">3</property>
+            <property name="ypad">3</property>
+            <property name="label" translatable="yes">&#x421;&#x436;&#x430;&#x442;&#x438;&#x435;</property>
+            <property name="justify">right</property>
+            <property name="single_line_mode">True</property>
+          </object>
+          <packing>
+            <property name="top_attach">2</property>
+            <property name="bottom_attach">3</property>
+            <property name="x_options">GTK_FILL</property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkHScale" id="ratio_scale">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="fill_level">100</property>
+            <property name="digits">0</property>
+          </object>
+          <packing>
+            <property name="left_attach">2</property>
+            <property name="right_attach">3</property>
+            <property name="top_attach">2</property>
+            <property name="bottom_attach">3</property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="size_edit">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">&#x41C;&#x430;&#x43A;&#x441;&#x438;&#x43C;&#x430;&#x43B;&#x44C;&#x43D;&#x44B;&#x439; &#x440;&#x430;&#x437;&#x43C;&#x435;&#x440; &#x444;&#x43E;&#x442;&#x43E;&#x433;&#x440;&#x430;&#x444;&#x438;&#x438;: &#x428;&#x418;&#x420;&#x418;&#x41D;&#x410; x &#x412;&#x42B;&#x421;&#x41E;&#x422;&#x410; &#x438;&#x43B;&#x438; &#x41F;&#x420;&#x41E;&#x426;&#x415;&#x41D;&#x422;%</property>
+            <property name="invisible_char">&#x25CF;</property>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+            <property name="top_attach">2</property>
+            <property name="bottom_attach">3</property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkProgressBar" id="progress_bar"/>
+          <packing>
+            <property name="right_attach">3</property>
+            <property name="top_attach">5</property>
+            <property name="bottom_attach">6</property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkStatusbar" id="status_bar">
+            <property name="visible">True</property>
+            <property name="spacing">2</property>
+          </object>
+          <packing>
+            <property name="right_attach">3</property>
+            <property name="top_attach">6</property>
+            <property name="bottom_attach">7</property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="src_edit">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">&#x41A;&#x430;&#x442;&#x430;&#x43B;&#x43E;&#x433; &#x441; &#x438;&#x441;&#x445;&#x43E;&#x434;&#x43D;&#x44B;&#x43C;&#x438; &#x444;&#x43E;&#x442;&#x43E;&#x433;&#x440;&#x430;&#x444;&#x438;&#x44F;&#x43C;&#x438;</property>
+            <property name="invisible_char">&#x25CF;</property>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow" id="scrolledwindow1">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="hscrollbar_policy">automatic</property>
+            <property name="vscrollbar_policy">automatic</property>
+            <child>
+              <object class="GtkTextView" id="textview">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="editable">False</property>
+                <property name="cursor_visible">False</property>
+                <property name="accepts_tab">False</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="right_attach">3</property>
+            <property name="top_attach">3</property>
+            <property name="bottom_attach">4</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

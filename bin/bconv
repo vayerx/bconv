@@ -1,0 +1,194 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+
+#############################################################################
+#    Yet Another ImageMagic Frontend                                        #
+#    (C) 2010-2011, Vasiliy Yeremeyev <vayerx@gmail.com>                    #
+#                                                                           #
+#    This program is free software: you can redistribute it and/or modify   #
+#    it under the terms of the GNU General Public License as published by   #
+#    the Free Software Foundation, either version 3 of the License, or      #
+#    (at your option) any later version.                                    #
+#                                                                           #
+#    This program is distributed in the hope that it will be useful,        #
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of         #
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          #
+#    GNU General Public License for more details.                           #
+#                                                                           #
+#    You should have received a copy of the GNU General Public License      #
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.  #
+#############################################################################
+
+# TODO humanist config interface (parseconfig -> /dev/null)
+# TODO thinking of 'libglade2 -> raw gtk2'
+# TODO humanist errors notification
+
+
+require 'bconv'
+require 'parseconfig'
+require 'libglade2'
+
+class ConverterGUI
+    MIN_RATIO = 65
+    MAX_RATIO = 100
+
+    def initialize(file_or_data)
+        @semaphore = Mutex.new
+        @counting_thread = nil
+        @source_files = []
+
+        @config_file = RUBY_PLATFORM =~ /linux|bsd|darwin|cygwin/i ? File.expand_path('~/.bconv.conf') : 'bconv.ini'
+        @config = ParseConfig.new(@config_file) rescue nil
+
+        @converter = Converter.new
+        @builder = Gtk::Builder.new
+        @builder << file_or_data
+        @builder.connect_signals { |name| method(name) }
+
+        %w[src_edit dest_edit size_edit ratio_scale run_button src_button dest_button
+            textview progress_bar status_bar main_window].each do |control|
+            instance_variable_set('@' + control, @builder[ control ])
+        end
+
+        @src_edit.text = @config.get_value('source') rescue ''
+        @dest_edit.text = @config.get_value('destination') rescue ''
+        @size_edit.text = @config.get_value('size') rescue '1600x1200'
+
+        @ratio_scale.set_range(MIN_RATIO, MAX_RATIO)
+        ratio = @config.get_value('ratio').to_i rescue 95
+        @ratio_scale.value = (ratio < MIN_RATIO ? MIN_RATIO : (ratio > MAX_RATIO ? MAX_RATIO : ratio))
+
+        @main_window.show
+
+        preload_dir(@src_edit.text) unless @src_edit.text.empty?
+    end
+
+    def run
+        Gtk.main
+    end
+
+    def on_src_button_clicked
+        dialog = Gtk::FileChooserDialog.new("Выбери исходную папку",
+                                         @main_window,
+                                         Gtk::FileChooser::ACTION_SELECT_FOLDER,
+                                         nil,
+                                         [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_CANCEL],
+                                         [Gtk::Stock::OPEN, Gtk::Dialog::RESPONSE_ACCEPT])
+
+        dialog.current_folder = @src_edit.text
+        if dialog.run == Gtk::Dialog::RESPONSE_ACCEPT
+            preload_dir(@src_edit.text = dialog.filename)
+        end
+        dialog.destroy
+    end
+
+    def preload_dir(dir)
+        @converter.preload_dir(dir) do |amount|
+            @status_bar.push(@status_bar.get_context_id(:init.to_s), "Найдено #{amount} файл(ов)") rescue nil
+        end
+    end
+
+    def on_dest_button_clicked
+        dialog = Gtk::FileChooserDialog.new("Выбери папку для результата",
+                                         @main_window,
+                                         Gtk::FileChooser::ACTION_SELECT_FOLDER,
+                                         nil,
+                                         [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_CANCEL],
+                                         [Gtk::Stock::OPEN, Gtk::Dialog::RESPONSE_ACCEPT])
+
+        dialog.current_folder = @dest_edit.text
+        if dialog.run == Gtk::Dialog::RESPONSE_ACCEPT
+            @dest_edit.text = dialog.filename
+        end
+        dialog.destroy
+    end
+
+    # Save configuration
+    def save_config
+        File.open(@config_file, 'w') do |f|
+            f << 'source=' << @src_edit.text << "\n"
+            f << 'destination=' << @dest_edit.text << "\n"
+            f << 'size=' << @size_edit.text << "\n"
+            f << 'ratio=' << @ratio_scale.value.to_i << "\n"
+        end
+    end
+
+    # Execute main job
+    def on_run_button_clicked
+        save_config
+
+        # check format of image size
+        img_size = @size_edit.text.gsub(/\s/, '')
+        begin
+            if img_size.index('%') || img_size.index('@')
+                raise img_size unless img_size.gsub!(/^(\d*)([%@])/, '\1\2')
+            else
+                raise img_size unless img_size.gsub!(/^(\d*)\w?(\d*)(\D?)$/, '\1x\2\3')
+            end
+        rescue
+            @textview.buffer.text = "Некорретный размер изображения '#{@size_edit.text}'"
+            return
+        end
+
+        ratio = @ratio_scale.value.to_i
+        if (ratio < 1 || ratio > 100)
+            @textview.buffer.text = "Недопустимый диапазон сжатия '#{ratio}'"
+            return
+        end
+
+        return unless check_directories(@src_edit.text, @dest_edit.text)
+
+        @textview.buffer.text = ""
+        @progress_bar.fraction = 0
+
+        lockUI
+        @converter.process(@src_edit.text, @dest_edit.text, img_size, ratio) { |file, step, done|
+            pulse_progress(file, step, done)
+        }
+    end
+
+    # Exit main loop
+    def on_main_window_destroy
+        @converter.stop
+        Gtk.main_quit
+    end
+
+    def lockUI
+        [ @run_button, @src_button, @dest_button ].each { |button| button.hide }
+        @progress_bar.show
+    end
+
+    def unlockUI
+        [ @run_button, @src_button, @dest_button ].each { |button| button.show }
+        @progress_bar.hide
+    end
+
+    # Check source/destination directories
+    def check_directories(src_dir, dest_dir)
+        # check source
+        if !FileTest.directory?(src_dir) 
+            @textview.buffer.text = "#{src_dir} должно быть директорией" 
+            return false
+        end
+
+        # check destination
+        Dir.mkdir(dest_dir, 0775) unless FileTest.exists?(dest_dir) 
+        if !FileTest.directory?(dest_dir)
+            @textview.buffer.text = "#{dest_dir} должно быть директорией" 
+            return false
+        end
+        true
+    end
+
+    def pulse_progress(file, step, done)
+        @semaphore.synchronize do
+            @textview.buffer.text = file + "\n" + @textview.buffer.text if file
+            @progress_bar.fraction += step if step
+            unlockUI if done
+        end
+    end
+end
+
+Encoding.default_external = 'UTF-8'
+gui = ConverterGUI.new(File.read(File.expand_path('bconv.glade', File.dirname(__FILE__)+'/..')))
+gui.run
