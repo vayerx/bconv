@@ -104,7 +104,9 @@ class Converter
             progress.call(nil, pulse_step, false)
         end
     ensure
-        @semaphore.synchronize { progress.call(nil, nil, true) if (@amount_of_jobs -= 1) == 0 }
+        @semaphore.synchronize {
+            progress.call(nil, nil, true) if (@jobs_slots -= 1) == 0
+        }
     end
 
     # Find JPEG files in a directory

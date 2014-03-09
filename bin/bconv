@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby19
 # encoding: UTF-8
 
 #############################################################################
@@ -50,12 +50,12 @@ class ConverterGUI
             instance_variable_set('@' + control, @builder[ control ])
         end
 
-        @src_edit.text = @config.get_value('source') rescue ''
-        @dest_edit.text = @config.get_value('destination') rescue ''
-        @size_edit.text = @config.get_value('size') rescue '1600x1200'
+        @src_edit.text = @config['source'] rescue ''
+        @dest_edit.text = @config['destination'] rescue ''
+        @size_edit.text = @config['size'] rescue '1600x1200'
 
         @ratio_scale.set_range(MIN_RATIO, MAX_RATIO)
-        ratio = @config.get_value('ratio').to_i rescue 95
+        ratio = @config['ratio'].to_i rescue 95
         @ratio_scale.value = (ratio < MIN_RATIO ? MIN_RATIO : (ratio > MAX_RATIO ? MAX_RATIO : ratio))
 
         @main_window.show

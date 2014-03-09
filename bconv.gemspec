@@ -1,6 +1,6 @@
 spec = Gem::Specification.new do |s|
     s.name = 'bconv'
-    s.version = "0.0.3"
+    s.version = "0.0.4"
     s.summary = 'ImageMagick frontend for fast jpeg compression.'
     s.description = 'Yet another ImageMagick hardcore gui-frontend with multi-threading. Only Russian language is supported.'
     s.author = 'Vasiliy Yeremeyev'
