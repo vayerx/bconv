@@ -190,5 +190,5 @@ class ConverterGUI
 end
 
 Encoding.default_external = 'UTF-8'
-gui = ConverterGUI.new(File.read(File.expand_path('bconv.glade', File.dirname(__FILE__)+'/..')))
+gui = ConverterGUI.new(File.read(File.expand_path('data/bconv.glade', File.dirname(__FILE__)+'/..')))
 gui.run
